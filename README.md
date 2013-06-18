@@ -18,7 +18,7 @@ thematic_map
 -------------------------------------
 Пример1
 
-![Screenshot]((https://raw.github.com/rusakovprz/thematic_map/master/example_image/Example_image_1.png)
+![Screenshot](https://raw.github.com/rusakovprz/thematic_map/master/example_image/Example_image_1.png)
 
 Пример2
 
@@ -26,4 +26,4 @@ thematic_map
 
 Пример3
 
-![Screenshot]((https://raw.github.com/rusakovprz/thematic_map/master/example_image/Example_image_3.png)
+![Screenshot](https://raw.github.com/rusakovprz/thematic_map/master/example_image/Example_image_3.png)
