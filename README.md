@@ -18,12 +18,12 @@ thematic_map
 -------------------------------------
 Пример1
 
-![Screenshot](https://github.com/rusakovprz/thematic_map/blob/master/example_image/Example_image_1.png)
+![Screenshot](https://raw.github.com/rusakovprz/thematic_map/blob/master/example_image/Example_image_1.png)
 
 Пример2
 
-![Screenshot](https://github.com/rusakovprz/thematic_map/blob/master/example_image/Example_image_2.png)
+![Screenshot](https://raw.github.com/rusakovprz/thematic_map/master/example_image/Example_image_2.png)
 
 Пример3
 
-![Screenshot](https://github.com/rusakovprz/thematic_map/blob/master/example_image/Example_image_3.png)
+![Screenshot](https://raw.github.com/rusakovprz/thematic_map/blob/master/example_image/Example_image_3.png)
