@@ -48,9 +48,10 @@ class gui(Tk):
     label_input_file_name .pack(side=LEFT, fill=X)
 
     self.current_color = StringVar()
-    opt1 = OptionMenu(row_collor, self.current_color, "Градации серого","Оранжевый","Фиолетовый","Зелёный" )
+    opt1 = OptionMenu(row_collor, self.current_color, u"Градации серого", u"Оранжевый", u"Фиолетовый", u"Зелёный" )
     opt1.pack(side=LEFT, fill=X)
-    self.current_color.set("Градации серого")
+    self.current_color.set(u"Градации серого")
+    self.color_code = {u"Градации серого": 0, u"Оранжевый": 1, u"Фиолетовый": 2, u"Зелёный": 3}
 
     row_band = Frame(self)
     row_band.pack(side=TOP, fill=X)
@@ -149,17 +150,7 @@ class gui(Tk):
     # Имя входного файла
     file_name_input = self.entry_input_file_name.get()
     # Цветовая палитра
-    current_color = self.current_color.get()
-
-    current_color_n = 0
-    if current_color == u"Градации серого":
-      current_color_n = 0
-    if current_color == u"Оранжевый":
-      current_color_n = 1
-    if current_color == u"Фиолетовый":
-      current_color_n = 2
-    if current_color == u"Зелёный":
-      current_color_n = 3
+    current_color = self.color_code[self.current_color.get()]
 
     # Количество интервалов
     current_band = strToInt(self.current_band.get())
@@ -201,7 +192,7 @@ class gui(Tk):
                  [min_value+step*4, min_value+step*5,]]
 
     # Редактируем SVG файл
-    ret_svg = edit_svg(svg_code, statistic, current_band, intervals, current_color_n)
+    ret_svg = edit_svg(svg_code, statistic, current_band, intervals, current_color)
 
     # Конвертируем SVG в PNG
     img =  cairo.ImageSurface(cairo.FORMAT_ARGB32, 1700,1050)
@@ -209,6 +200,7 @@ class gui(Tk):
     handler= rsvg.Handle(None, ret_svg)
     handler.render_cairo(ctx)
     img.write_to_png(file_name_output)
+
 
 if __name__ == '__main__':
   gui().mainloop()      # запустить цикл событий
