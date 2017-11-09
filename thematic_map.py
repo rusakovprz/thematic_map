@@ -137,14 +137,12 @@ class gui(Tk):
     Button(self,text= 'Создать зображение', command =  (lambda: self.create_image() )).pack()
 
   def get_input_file_name(self, entry):
-    file_name = askopenfilename()
     entry.delete(0,500)
-    entry.insert(0, file_name)
+    entry.insert(0, askopenfilename())
 
   def get_output_file_name(self, entry):
-    file_name = asksaveasfilename()
     entry.delete(0,500)
-    entry.insert(0, file_name)
+    entry.insert(0, asksaveasfilename())
 
   def create_image(self):
 
@@ -180,10 +178,12 @@ class gui(Tk):
     statistic = read_and_parse_csv(file_name_input)
 
     # Загружаем  SVG файл c границами регионов
+    file_name_regions = 'RF_Regions.svg'
+
     try:
-      svg_code = open('RF_Regions.svg', 'r').read()
+      svg_code = open(file_name_regions, 'r').read()
     except:
-      showerror("Ошибка", "Не найден файл 'RF_Regions.svg'.")
+      showerror("Ошибка", "Не найден файл '" + file_name_regions + "'.")
       return
 
     # Проверяем и подготавливаем данные (интервалы значений для автоматического режима)
@@ -212,5 +212,4 @@ class gui(Tk):
 
 if __name__ == '__main__':
   gui().mainloop()      # запустить цикл событий
-
 
