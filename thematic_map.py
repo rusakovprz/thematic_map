@@ -144,61 +144,48 @@ class gui(Tk):
     entry.insert(0, asksaveasfilename())
 
   def create_image(self):
+    try:
+      # Загружаем  SVG файл c границами регионов.
+      file_name_regions = 'RF_Regions.svg'
+      regions = open(file_name_regions, 'r').read()
+    except:
+      showerror("Ошибка", "Не найден файл '" + file_name_regions + "'.")
+      return
 
-    # Имя входного файла
-    file_name_input = self.entry_input_file_name.get()
+    # Читаем и парсим SCV файл статистики.
+    statistic = thematic_map_lib.read_and_parse_csv(self.entry_input_file_name.get())
 
-    # Цветовая палитра
-    current_color = self.color_code[self.current_color.get()]
-
-    # Количество интервалов
+    # Количество интервалов.
     current_band = strToInt(self.current_band.get())
 
-    # Значения интервалов
-    intervals = [
-                 [strToFloat(self.interval_1_from.get()), strToFloat(self.interval_1_to.get())],
+    # Значения интервалов.
+    intervals = [[strToFloat(self.interval_1_from.get()), strToFloat(self.interval_1_to.get())],
                  [strToFloat(self.interval_2_from.get()), strToFloat(self.interval_2_to.get())],
                  [strToFloat(self.interval_3_from.get()), strToFloat(self.interval_3_to.get())],
                  [strToFloat(self.interval_4_from.get()), strToFloat(self.interval_4_to.get())],
                  [strToFloat(self.interval_5_from.get()), strToFloat(self.interval_5_to.get())],
                  [strToFloat(self.interval_6_from.get()), strToFloat(self.interval_6_to.get())]]
 
-    # Имя выходного файла
-    file_name_output = self.entry_output_file_name.get()
-
-    # Читаем и парсим SCV файл
-    statistic = thematic_map_lib.read_and_parse_csv(file_name_input)
-
-    # Загружаем  SVG файл c границами регионов
-    file_name_regions = 'RF_Regions.svg'
-
-    try:
-      svg_code = open(file_name_regions, 'r').read()
-    except:
-      showerror("Ошибка", "Не найден файл '" + file_name_regions + "'.")
-      return
-
     # Проверяем и подготавливаем данные (интервалы значений для автоматического режима)
     if current_band == 0:
        current_band = 5
-       intervals = []
        (min_value, max_value) = thematic_map_lib.get_min_max_values( statistic.values() )
-
        step = (max_value - min_value)/5
-       intervals = [
-                 [min_value, min_value+step],
-                 [min_value+step, min_value+step*2],
-                 [min_value+step*2, min_value+step*3],
-                 [min_value+step*3, min_value+step*4],
-                 [min_value+step*4, min_value+step*5,]]
+       intervals = [[min_value, min_value+step],
+                    [min_value+step, min_value+step*2],
+                    [min_value+step*2, min_value+step*3],
+                    [min_value+step*3, min_value+step*4],
+                    [min_value+step*4, min_value+step*5,]]
+
+    current_color = self.color_code[self.current_color.get()]
 
     # Редактируем SVG файл
-    map_svg = thematic_map_lib.edit_svg(svg_code, statistic, current_band, intervals, current_color)
+    map_svg = thematic_map_lib.edit_svg(regions, statistic, current_band, intervals, current_color)
 
     # Конвертируем  и сохраняем SVG в PNG
     image_width = 1700
     image_height = 1050
-    thematic_map_lib.save_svg_to_png(map_svg, file_name_output, image_width, image_height)
+    thematic_map_lib.save_svg_to_png(map_svg, self.entry_output_file_name.get(), image_width, image_height)
 
 
 if __name__ == '__main__':
