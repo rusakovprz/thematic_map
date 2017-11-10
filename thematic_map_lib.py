@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import csv
-import cairo
-import rsvg
 from xml.dom import minidom
 import xml.etree as etree
+
+import cairo
+import rsvg
 
 
 global colors
@@ -17,7 +18,6 @@ colors = [
 # 6 градаций серого
 [[247, 247, 247],[217, 217, 217],[189, 189, 189],[150, 150, 150],[99, 99, 99],[37, 37, 37]]
 ],
-#----------------------------------------
 [
 # 4 градации оранжевого (orange)
 [[254, 240, 217],[253, 204, 138],[252, 141, 89],[215, 48, 31]],
@@ -26,7 +26,6 @@ colors = [
 # 6 градаций оранжевого
 [[254, 240, 217],[253, 212, 158],[253, 187, 132],[252, 141, 89],[227, 74, 51],[179, 0, 0]]
 ],
-#----------------------------------------
 [
 # 4 градации фиолетового (purple)
 [[242, 240, 247],[203, 201, 226],[158, 154, 200],[106, 81, 163]],
@@ -35,7 +34,6 @@ colors = [
 # 6 градаций фиолетового
 [[242, 240, 247],[218, 218, 235],[188, 189, 220],[158, 154, 200],[117, 107, 177],[84, 39, 143]]
 ],
-#----------------------------------------
 [
 # 4 градации зелёного
 [[237, 248, 233],[186, 228, 179],[116, 196, 118],[35, 139, 69]],
@@ -45,7 +43,6 @@ colors = [
 [[237, 248, 233],[199, 233, 192],[161, 217, 155],[116, 196, 118],[49, 163, 84],[0, 109, 44]]
 ]		]
 
-#=======================================================================================================================
 
 def read_and_parse_csv(filename):
   data = {}
@@ -70,7 +67,6 @@ def read_and_parse_csv(filename):
 
   return data
 
-#=======================================================================================================================  
 
 def get_min_max_values(in_value):
 
@@ -86,7 +82,6 @@ def get_min_max_values(in_value):
 
   return min(tmp_array), max(tmp_array)
 
-#=======================================================================================================================  
 
 def edit_svg(svg, statistic, match_band, bands, palett):
 
@@ -184,4 +179,17 @@ def edit_svg(svg, statistic, match_band, bands, palett):
       path.appendChild(textnode)
 
   return doc.toprettyxml(encoding='utf-8')
+
+
+def save_svg_to_png(svg, file_name, image_width, image_height):
+    """
+        Конвертирует и сохраняет SVG в PNG.
+
+        FIXME: Функция выполняет я действия (конвертация + сохранение в файл).
+    """
+    img =  cairo.ImageSurface(cairo.FORMAT_ARGB32, image_width, image_height)
+    ctx = cairo.Context(img)
+    handler= rsvg.Handle(None, svg)
+    handler.render_cairo(ctx)
+    img.write_to_png(file_name)
 

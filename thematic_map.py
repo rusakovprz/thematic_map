@@ -4,17 +4,15 @@ from Tkinter import *
 from tkMessageBox import *
 from tkFileDialog  import *
 
-from thematic_map_lib  import *
+import thematic_map_lib
 
-#=======================================================================================================================
-
+# TODO: Move to utils.
 def strToFloat( arg ):
   try:
     return float(arg)
   except:
     return 0
 
-#=======================================================================================================================
 
 def strToInt( arg ):
   try:
@@ -149,11 +147,13 @@ class gui(Tk):
 
     # Имя входного файла
     file_name_input = self.entry_input_file_name.get()
+
     # Цветовая палитра
     current_color = self.color_code[self.current_color.get()]
 
     # Количество интервалов
     current_band = strToInt(self.current_band.get())
+
     # Значения интервалов
     intervals = [
                  [strToFloat(self.interval_1_from.get()), strToFloat(self.interval_1_to.get())],
@@ -162,11 +162,12 @@ class gui(Tk):
                  [strToFloat(self.interval_4_from.get()), strToFloat(self.interval_4_to.get())],
                  [strToFloat(self.interval_5_from.get()), strToFloat(self.interval_5_to.get())],
                  [strToFloat(self.interval_6_from.get()), strToFloat(self.interval_6_to.get())]]
+
     # Имя выходного файла
     file_name_output = self.entry_output_file_name.get()
 
     # Читаем и парсим SCV файл
-    statistic = read_and_parse_csv(file_name_input)
+    statistic = thematic_map_lib.read_and_parse_csv(file_name_input)
 
     # Загружаем  SVG файл c границами регионов
     file_name_regions = 'RF_Regions.svg'
@@ -181,7 +182,7 @@ class gui(Tk):
     if current_band == 0:
        current_band = 5
        intervals = []
-       (min_value, max_value) = get_min_max_values( statistic.values() )
+       (min_value, max_value) = thematic_map_lib.get_min_max_values( statistic.values() )
 
        step = (max_value - min_value)/5
        intervals = [
@@ -192,14 +193,12 @@ class gui(Tk):
                  [min_value+step*4, min_value+step*5,]]
 
     # Редактируем SVG файл
-    ret_svg = edit_svg(svg_code, statistic, current_band, intervals, current_color)
+    map_svg = thematic_map_lib.edit_svg(svg_code, statistic, current_band, intervals, current_color)
 
-    # Конвертируем SVG в PNG
-    img =  cairo.ImageSurface(cairo.FORMAT_ARGB32, 1700,1050)
-    ctx = cairo.Context(img)
-    handler= rsvg.Handle(None, ret_svg)
-    handler.render_cairo(ctx)
-    img.write_to_png(file_name_output)
+    # Конвертируем  и сохраняем SVG в PNG
+    image_width = 1700
+    image_height = 1050
+    thematic_map_lib.save_svg_to_png(map_svg, file_name_output, image_width, image_height)
 
 
 if __name__ == '__main__':
