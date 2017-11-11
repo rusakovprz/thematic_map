@@ -69,49 +69,50 @@ def parse_csv(filename):
 
 
 def edit_svg(svg, statistic, match_band, bands, palett):
-  # FIXME: Декомпозиция.
-
   flag_no_data = False                      # Признак отсутствия данных хотябы для одного региона.
   doc = minidom.parseString(svg)            # Парсим SVG.
   paths = doc.getElementsByTagName("path")  # Просматриваем всю карту. Находим соответствующий узел и редактируем его.
 
   for path in paths:
-      region = path.getAttribute("id")
-      if region == "":  # В SVG файле могут быть объекты с тегом "path" не опписывающие границы региона.
-        continue
-
-      try:
-        value = float(statistic[region])
-      except:
-        flag_no_data = True
-
-        if palett == 0:
-          path.setAttribute("style", "")
-          path.setAttribute("fill", "url(#hatching)")
-          path.setAttribute("stroke", "black")
-          path.setAttribute("stroke-width", "2")
-        else:
-          [r,g,b] = colors[0][2][3]
-          style="fill: rgb(" + str(r) + ", " + str(g) + ", " + str(b) + "); fill-opacity: 1;"
-          path.setAttribute("style", style)
-        continue
+    region = path.getAttribute("id")
+    if region == "":  # В SVG файле могут быть объекты с тегом "path" не опписывающие границы региона.
+      continue
+    try:
+      value = float(statistic[region])
+    except:
+      flag_no_data = True
+      if palett == 0:
+        path.setAttribute("style", "")
+        path.setAttribute("fill", "url(#hatching)")
+        path.setAttribute("stroke", "black")
+        path.setAttribute("stroke-width", "2")
       else:
-        col = 0
-        i = 0
-        while i < match_band:
-          if value >= bands[i][0] and value < bands[i][1]:
-            col = i
-            break
-          i += 1
-        [r,g,b] = colors[palett][match_band-4][col]
+        [r,g,b] = colors[0][2][3]
         style="fill: rgb(" + str(r) + ", " + str(g) + ", " + str(b) + "); fill-opacity: 1;"
         path.setAttribute("style", style)
+      continue
+    else:
+      col = 0
+      i = 0
+      while i < match_band:
+        if value >= bands[i][0] and value < bands[i][1]:
+          col = i
+          break
+        i += 1
+      [r,g,b] = colors[palett][match_band-4][col]
+      style="fill: rgb(" + str(r) + ", " + str(g) + ", " + str(b) + "); fill-opacity: 1;"
+      path.setAttribute("style", style)
 
+  edit_legend(doc, bands, match_band, palett, flag_no_data)
+  return doc.toprettyxml(encoding='utf-8')
+
+
+def edit_legend(doc, bands, match_band, palett, flag_no_data):
   # Легенда.
   for path in doc.getElementsByTagName("rect"):
     ID = path.getAttribute("id")
     if int(ID) > match_band:
-      if flag_no_data :
+      if flag_no_data:
         if palett > 0:
           [r,g,b] = colors[0][2][3]
           style="fill: rgb(" + str(r) + ", " + str(g) + ", " + str(b) + "); fill-opacity: 1;"
@@ -126,11 +127,11 @@ def edit_svg(svg, statistic, match_band, bands, palett):
     style="fill: rgb(" + str(r) + ", " + str(g) + ", " + str(b) + "); fill-opacity: 1;"
     path.setAttribute("style", style)
 
-  # подпись легенды.
+  # Подпись легенды.
   for path in doc.getElementsByTagName("text"):
     ID = path.getAttribute("id")
     if int(ID) > match_band:
-      if flag_no_data :
+      if flag_no_data:
         path.setAttribute("style", "font-size: 30px; fill: rgb(0, 0, 0); fill-opacity: 1; font-family: Arial;")
         s = unicode( "Значение не задано", encoding='utf-8' )
         textnode = doc.createTextNode( s )
@@ -140,8 +141,6 @@ def edit_svg(svg, statistic, match_band, bands, palett):
     s = unicode( str(bands[ int(ID)-1 ][0]) + " - " + str(bands[int(ID)-1][1]) , encoding='utf-8' )
     textnode = doc.createTextNode( s )
     path.appendChild(textnode)
-
-  return doc.toprettyxml(encoding='utf-8')
 
 
 def save_svg_to_png(svg, file_name, image_width, image_height):
