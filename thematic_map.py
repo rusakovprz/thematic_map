@@ -5,22 +5,8 @@ from tkMessageBox import *
 from tkFileDialog  import *
 
 import thematic_map_lib
+import utils
 
-# TODO: Move to utils.
-def strToFloat( arg ):
-  try:
-    return float(arg)
-  except:
-    return 0
-
-
-def strToInt( arg ):
-  try:
-    return int(arg)
-  except:
-    return 0
-
-#=========== GUI ============================================================================================================
 
 class gui(Tk):
   def __init__(self):
@@ -152,24 +138,24 @@ class gui(Tk):
       showerror("Ошибка", "Не найден файл '" + file_name_regions + "'.")
       return
 
-    # Читаем и парсим SCV файл статистики.
-    statistic = thematic_map_lib.read_and_parse_csv(self.entry_input_file_name.get())
+    # Парсим SCV файл статистики.
+    statistic = thematic_map_lib.parse_csv(self.entry_input_file_name.get())
 
     # Количество интервалов.
-    current_band = strToInt(self.current_band.get())
+    current_band = utils.strToInt(self.current_band.get())
 
     # Значения интервалов.
-    intervals = [[strToFloat(self.interval_1_from.get()), strToFloat(self.interval_1_to.get())],
-                 [strToFloat(self.interval_2_from.get()), strToFloat(self.interval_2_to.get())],
-                 [strToFloat(self.interval_3_from.get()), strToFloat(self.interval_3_to.get())],
-                 [strToFloat(self.interval_4_from.get()), strToFloat(self.interval_4_to.get())],
-                 [strToFloat(self.interval_5_from.get()), strToFloat(self.interval_5_to.get())],
-                 [strToFloat(self.interval_6_from.get()), strToFloat(self.interval_6_to.get())]]
+    intervals = [[utils.strToFloat(self.interval_1_from.get()), utils.strToFloat(self.interval_1_to.get())],
+                 [utils.strToFloat(self.interval_2_from.get()), utils.strToFloat(self.interval_2_to.get())],
+                 [utils.strToFloat(self.interval_3_from.get()), utils.strToFloat(self.interval_3_to.get())],
+                 [utils.strToFloat(self.interval_4_from.get()), utils.strToFloat(self.interval_4_to.get())],
+                 [utils.strToFloat(self.interval_5_from.get()), utils.strToFloat(self.interval_5_to.get())],
+                 [utils.strToFloat(self.interval_6_from.get()), utils.strToFloat(self.interval_6_to.get())]]
 
     # Проверяем и подготавливаем данные (интервалы значений для автоматического режима)
     if current_band == 0:
        current_band = 5
-       (min_value, max_value) = thematic_map_lib.get_min_max_values( statistic.values() )
+       (min_value, max_value) = utils.get_min_max_values( statistic.values() )
        step = (max_value - min_value)/5
        intervals = [[min_value, min_value+step],
                     [min_value+step, min_value+step*2],

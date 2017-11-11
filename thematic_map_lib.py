@@ -44,7 +44,7 @@ colors = [
 ]		]
 
 
-def read_and_parse_csv(filename):
+def parse_csv(filename):
   data = {}
 
   try:
@@ -68,61 +68,34 @@ def read_and_parse_csv(filename):
   return data
 
 
-def get_min_max_values(in_value):
-
-  tmp_array = []
-
-  i = 0
-  while i < len(in_value):
-    try:
-      tmp_array.append( float(in_value[i]) )
-    except:
-      pass
-    i += 1
-
-  return min(tmp_array), max(tmp_array)
-
-
 def edit_svg(svg, statistic, match_band, bands, palett):
+  # FIXME: Декомпозиция.
 
-  # Признак отсутствия данных хотябы для одного региона
-  flag_no_data = False
-
-  # Парсим SVG
-  doc = minidom.parseString(svg)
-
-  # просматриваем всю карту
-  # Находим соответствующий узел и редактируем его
-  paths = doc.getElementsByTagName("path")
+  flag_no_data = False                      # Признак отсутствия данных хотябы для одного региона.
+  doc = minidom.parseString(svg)            # Парсим SVG.
+  paths = doc.getElementsByTagName("path")  # Просматриваем всю карту. Находим соответствующий узел и редактируем его.
 
   for path in paths:
       region = path.getAttribute("id")
-
-      # В SVG файле могут быть объекты с тегом "path" не опписывающие границы региона
-      if region == "":
+      if region == "":  # В SVG файле могут быть объекты с тегом "path" не опписывающие границы региона.
         continue
 
       try:
         value = float(statistic[region])
-
       except:
         flag_no_data = True
 
         if palett == 0:
           path.setAttribute("style", "")
-
           path.setAttribute("fill", "url(#hatching)")
           path.setAttribute("stroke", "black")
           path.setAttribute("stroke-width", "2")
-
         else:
           [r,g,b] = colors[0][2][3]
           style="fill: rgb(" + str(r) + ", " + str(g) + ", " + str(b) + "); fill-opacity: 1;"
           path.setAttribute("style", style)
         continue
-
       else:
-
         col = 0
         i = 0
         while i < match_band:
@@ -130,53 +103,43 @@ def edit_svg(svg, statistic, match_band, bands, palett):
             col = i
             break
           i += 1
-
         [r,g,b] = colors[palett][match_band-4][col]
         style="fill: rgb(" + str(r) + ", " + str(g) + ", " + str(b) + "); fill-opacity: 1;"
         path.setAttribute("style", style)
 
-  # Легенда
-  paths = doc.getElementsByTagName("rect")
+  # Легенда.
+  for path in doc.getElementsByTagName("rect"):
+    ID = path.getAttribute("id")
+    if int(ID) > match_band:
+      if flag_no_data :
+        if palett > 0:
+          [r,g,b] = colors[0][2][3]
+          style="fill: rgb(" + str(r) + ", " + str(g) + ", " + str(b) + "); fill-opacity: 1;"
+          path.setAttribute("style", style)
+        else:
+          path.setAttribute("style", "")
+          path.setAttribute("fill", "url(#hatching)")
+          path.setAttribute("stroke", "black")
+          path.setAttribute("stroke-width", "2")
+      break
+    [r,g,b] = colors[palett][match_band-4][int(ID)-1]
+    style="fill: rgb(" + str(r) + ", " + str(g) + ", " + str(b) + "); fill-opacity: 1;"
+    path.setAttribute("style", style)
 
-  for path in paths:
-      ID = path.getAttribute("id")
-      if int(ID) > match_band:
-        if flag_no_data :
-          if palett > 0:
-            [r,g,b] = colors[0][2][3]
-            style="fill: rgb(" + str(r) + ", " + str(g) + ", " + str(b) + "); fill-opacity: 1;"
-            path.setAttribute("style", style)
-          else:
-            path.setAttribute("style", "")
-            path.setAttribute("fill", "url(#hatching)")
-            path.setAttribute("stroke", "black")
-            path.setAttribute("stroke-width", "2")
-        break
-
-      [r,g,b] = colors[palett][match_band-4][int(ID)-1]
-      style="fill: rgb(" + str(r) + ", " + str(g) + ", " + str(b) + "); fill-opacity: 1;"
-      path.setAttribute("style", style)
-
-
-  # подпись легенды
-  paths = doc.getElementsByTagName("text")
-
-  for path in paths:
-      ID = path.getAttribute("id")
-      if int(ID) > match_band:
-        if flag_no_data :
-          path.setAttribute("style", "font-size: 30px; fill: rgb(0, 0, 0); fill-opacity: 1; font-family: Arial;")
-
-          s = unicode( "Значение не задано", encoding='utf-8' )
-          textnode = doc.createTextNode( s )
-          path.appendChild(textnode)
-
-        break
-
-      path.setAttribute("style", "font-size: 30px; fill: rgb(0, 0, 0); fill-opacity: 1; font-family: Arial;")
-      s = unicode( str(bands[ int(ID)-1 ][0]) + " - " + str(bands[int(ID)-1][1]) , encoding='utf-8' ) 
-      textnode = doc.createTextNode( s )
-      path.appendChild(textnode)
+  # подпись легенды.
+  for path in doc.getElementsByTagName("text"):
+    ID = path.getAttribute("id")
+    if int(ID) > match_band:
+      if flag_no_data :
+        path.setAttribute("style", "font-size: 30px; fill: rgb(0, 0, 0); fill-opacity: 1; font-family: Arial;")
+        s = unicode( "Значение не задано", encoding='utf-8' )
+        textnode = doc.createTextNode( s )
+        path.appendChild(textnode)
+      break
+    path.setAttribute("style", "font-size: 30px; fill: rgb(0, 0, 0); fill-opacity: 1; font-family: Arial;")
+    s = unicode( str(bands[ int(ID)-1 ][0]) + " - " + str(bands[int(ID)-1][1]) , encoding='utf-8' )
+    textnode = doc.createTextNode( s )
+    path.appendChild(textnode)
 
   return doc.toprettyxml(encoding='utf-8')
 
@@ -184,8 +147,6 @@ def edit_svg(svg, statistic, match_band, bands, palett):
 def save_svg_to_png(svg, file_name, image_width, image_height):
     """
         Конвертирует и сохраняет SVG в PNG.
-
-        FIXME: Функция выполняет я действия (конвертация + сохранение в файл).
     """
     img =  cairo.ImageSurface(cairo.FORMAT_ARGB32, image_width, image_height)
     ctx = cairo.Context(img)
