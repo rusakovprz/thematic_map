@@ -139,7 +139,7 @@ class gui(Tk):
       return
 
     # Парсим SCV файл статистики.
-    statistic = thematic_map_lib.parse_csv(self.entry_input_file_name.get())
+    statistic = utils.parse_csv(self.entry_input_file_name.get())
 
     # Количество интервалов.
     current_band = utils.strToInt(self.current_band.get())

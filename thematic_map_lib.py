@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import csv
 from xml.dom import minidom
 import xml.etree as etree
 
@@ -42,30 +41,6 @@ colors = [
 # 6 градаций зелёного
 [[237, 248, 233],[199, 233, 192],[161, 217, 155],[116, 196, 118],[49, 163, 84],[0, 109, 44]]
 ]		]
-
-
-def parse_csv(filename):
-  data = {}
-
-  try:
-    reader = csv.reader(open(filename), delimiter=",")
-  except IOError:
-    showerror("Ошибка", "Указанный файл не найден.")
-    return data
-
-  for row in reader:
-    try:
-      region = row[0]
-      value =  row[1].strip()
-      data[region] = value
-
-    except IndexError as err:
-      print "read_and_parse_csv Error:", err
-
-    except :
-      showerror("Ошибка", "Нарушена стркутура CSV файла.")
-
-  return data
 
 
 def edit_svg(svg, statistic, match_band, bands, palett):
